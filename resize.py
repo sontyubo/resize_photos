@@ -1,40 +1,40 @@
 import re
-from PIL import Image
 
+from PIL import Image
 import glob
 from natsort import natsorted
 
 
-FOLDER_PATH = './photos'
+FOLDER_PATH = "./photos"
+# PATTERN = r"[a-zA-Z0-9_\-]+\.png$"    # 正規表現
+SHRINK = 2  # 縮小率
 
 
 def main():
-
-    pattern = r'IMG_\d*\.JPG'
-
-    file_paths = natsorted(glob.glob(f'{FOLDER_PATH}/*'))
-    #file_paths = ['./photos/IMG_7443.JPG']
+    file_paths = natsorted(glob.glob(f"{FOLDER_PATH}/*"))
 
     for file_path in file_paths:
+        img = Image.open(file_path)  # 画像を読み込む
 
-        # リサイズ前の画像を読み込み
-        img = Image.open(file_path)
-
-        match = re.search(pattern, file_path)
+        PATTERN = file_path[9:]  # ファイル名の取得
+        match = re.search(PATTERN, file_path)
 
         if match:
             img_name = match.group()
         else:
-            raise AssertionError('NoMatchPattern')
+            raise AssertionError("NoMatchPattern")
 
-        # 読み込んだ画像の幅、高さを取得し半分に
-        (width, height) = (img.width // 2, img.height // 2)
+        width, height = (
+            img.width // SHRINK,
+            img.height // SHRINK,
+        )  # 画像のサイズを変更
 
         # 画像をリサイズする
         img_resized = img.resize((width, height))
 
         # ファイルを保存
-        img_resized.save(f'resized_photos/{img_name}', quality=90)
+        img_resized.save(f"resized_photos/{img_name}", quality=90)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
